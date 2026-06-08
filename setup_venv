@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Script to set up a Python virtual environment with all the dependencies
+# required to run the exercises/tests/tools.
+
+set -e
+
+function print_usage {
+    echo "setup_venv -- Setup a virtual environment for the Python Education exercises"
+    echo ""
+    echo "Options:"
+    echo "  -h | --help: Display this help"
+    echo "  --pyexe    : Python executable to use. Defaults to $(which python3)"
+}
+
+PYTHON="$(which python3)"
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h | --help) print_usage; exit 0 ;;
+        --pyexe)     PYTHON="$2"; shift ;;
+    esac
+    shift
+done
+
+# Make the working directory be the root of the git repository
+cd "$(dirname "$(realpath "$0")")"
+
+# Remove any pre-existing virtual environment
+rm -rf venv
+
+# Create the virtual environment and source it
+"$PYTHON" -m venv venv
+source venv/bin/activate
+
+# Upgrade pip and install the requirements for all exercises
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+
+echo ""
+echo "Virtual environment successfully set up!"
+echo "Run \`source venv/bin/activate\` in order to use"

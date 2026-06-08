@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+function print_usage {
+    echo "run_tools -- Run tools over your Python source code"
+    echo ""
+    echo "Arguments:"
+    echo "  -h | --help: Display this help"
+    echo "  --ex       : Only run tests for the specified exercise"
+    echo ""
+    echo "Any other arguments are passed through to pytest."
+}
+
+EXERCISE=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h | --help) print_usage; exit 0 ;;
+        --ex)        EXERCISE="$2"; shift ;;
+    esac
+    shift
+done
+
+# Run over all exercises if no exercise specified
+FILEPATH="exercises"
+if [ -n "$EXERCISE" ]; then
+    FILEPATH="$FILEPATH/exercise$EXERCISE"
+fi
+
+# Make the working directory be the root of the git repository
+cd "$(dirname "$(realpath "$0")")"
+
+if [ ! -d "venv" ]; then
+    echo "Couldn't find the virtual environment to run the tests in - have you run ./setup_venv?"
+    exit 1
+fi
+
+# Run Black over the exercises
+venv/bin/python3 -m black "$FILEPATH"
+
+# Run Isort over the $FILEPATH
+venv/bin/python3 -m isort "$FILEPATH"
+
+# Run Mypy over the $FILEPATH
+venv/bin/python3 -m mypy "$FILEPATH"
