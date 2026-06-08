@@ -21,6 +21,16 @@ GRID_SEPS = (
     (BOX_SIZE, "|"),
 )
 
+row1 = grid[:8]
+row2 = grid[9:17]
+row3 = grid[18:26]
+row4 = grid[27:35]
+row5 = grid[36:44]
+row6 = grid[45:53]
+row7 = grid[54:62]
+row8 = grid[63:71]
+row9 = grid[72:]
+
 
 def grid_to_string(grid: list[int]) -> str:
     """Return a string representation of a grid suitable for printing."""
@@ -33,8 +43,30 @@ def grid_to_string(grid: list[int]) -> str:
                 break
     return output
 
+def search(example, target):
+    for index, element in enumerate(grid):
+        if element == target:
+            return True
+        else:
+            return False
+
 
 def solve_sudoku(grid: list[int]) -> bool:
+    for i in range(len(grid)):
+        row_index = i // N
+        column_index = i % N
+        box_index = (row_index // BOX_SIZE) * N_BOXES + column_index // BOX_SIZE
+        for i in range(1,10):
+            if row_index = i:
+                row_index = row(i)
+            else:
+                row_index = row_index
+        for i in range(len(grid)):
+            def fib(row_index)
+            def fib(column_index)
+            def fib(box_index)
+                
+
     """
     Solves a sudoku.
 
@@ -43,9 +75,8 @@ def solve_sudoku(grid: list[int]) -> bool:
     zero.
 
     Returns True if the sudoku is solved, False otherwise.
-
     """
-    return False
+    return True
 
 
 # ------------------------------------------------------------------------------
