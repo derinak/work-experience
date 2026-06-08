@@ -1,4 +1,4 @@
-# Git & GitHub Guide for Students
+# Git & GitHub Guide
 
 ## Introduction
 
