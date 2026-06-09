@@ -58,10 +58,10 @@ Cisco routers are networking devices that forward data packets between computer 
 
 ### Allowed Libraries
 
-- `csv` or built-in `open()` for file reading
-- `statistics` for mean/stdev calculations
-- `math` for sqrt and other mathematical operations
-- `matplotlib.pyplot` for plotting visualization
+- `csv` or built-in `open()` for file reading - [documentation](https://www.w3schools.com/python/ref_module_csv.asp)
+- `statistics` for mean/stdev calculations - [documentation](https://www.w3schools.com/python/module_statistics.asp)
+- `math` for sqrt and other mathematical operations - [documentation](https://www.w3schools.com/python/module_math.asp)
+- `matplotlib.pyplot` for plotting visualization - [documentation](https://www.w3schools.com/python/matplotlib_pyplot.asp)
 
 ## Technical Implementation Details
 
