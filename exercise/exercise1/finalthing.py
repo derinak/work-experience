@@ -49,13 +49,11 @@ def find_empty(grid):
     for z in range(len(grid)):
         if grid[z] == 0:
             return z
-        print(z)
-        return None
+    return None
     
 def validity(grid, cell, num):
     row = cell // 9
     col = cell % 9
-
     for c in range(9):
         if grid[row*9 + c] == num:
             return False
@@ -63,14 +61,19 @@ def validity(grid, cell, num):
     for s in range(9):
         if grid[s*9+col] == num:
             return False    
+    #box check
+
+    start_row = (row//3)*3
+    start_col = (col//3)*3
     
-    for r in range(row, row + 3):
-        for c in range(col, col + 3):
+    
+    for r in range(start_row, start_row + 3):
+        for c in range(start_col, start_col + 3):
             if grid[r*9+c] == num:
                 return False
             
-    print(cell)
     return True
+
 
 def solve_sudoku(grid: list[int]) -> bool:
     """
@@ -84,20 +87,19 @@ def solve_sudoku(grid: list[int]) -> bool:
 
     """
 
-    cell = find_empty(example)
-    if cell == None:
+    cell = find_empty(grid)
+    if cell is None:
         return True
     
 
-    for set in range(9):
-        if validity(grid, cell, set):
-            grid[cell] = set
+    for value in range(1,10):
+        if validity(grid, cell, value):
+            grid[cell] = value
 
             if solve_sudoku(grid):
-                return True
-
-            grid[cell] = 0  
-
+                return True 
+            
+            grid[cell] = 0
     return False
 
 
