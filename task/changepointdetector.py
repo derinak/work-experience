@@ -1,0 +1,1 @@
+#changepoint detector will probabyl start tomorrow so i dont forget anything
