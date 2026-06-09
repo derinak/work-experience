@@ -69,6 +69,7 @@ Cisco routers are networking devices that forward data packets between computer 
 
 ```python
 def detect_anomalies(data, window_size=40, n_sigma=4):
+    
     """
     Args:
         data: List of numeric values

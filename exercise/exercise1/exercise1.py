@@ -18,18 +18,7 @@ GRID_SEPS = (
     (N * N, "\n"),
     (N * BOX_SIZE, "\n---+---+---\n"),
     (N, "\n"),
-    (BOX_SIZE, "|"),
-)
-
-row1 = grid[:8]
-row2 = grid[9:17]
-row3 = grid[18:26]
-row4 = grid[27:35]
-row5 = grid[36:44]
-row6 = grid[45:53]
-row7 = grid[54:62]
-row8 = grid[63:71]
-row9 = grid[72:]
+    (BOX_SIZE, "|"),)
 
 
 def grid_to_string(grid: list[int]) -> str:
@@ -43,30 +32,65 @@ def grid_to_string(grid: list[int]) -> str:
                 break
     return output
 
-def search(example, target):
-    for index, element in enumerate(grid):
-        if element == target:
-            return True
-        else:
-            return False
+def solve_sudoku_internal(grid: list[int], row_sets: list[set[int]], column_sets: list[set[int]], box_sets: list[set[int]], index: int = 0) -> bool:
+    if index >= N*N:
+        return True
+    if grid[index] != 0:
+        return solve_sudoku_internal(grid, row_sets, column_sets, box_sets, index + 1)
+    row = index // N
+    column = index % N
+    box = (row // BOX_SIZE) * N_BOXES + column // BOX_SIZE
+    for value in range(1,10):
+        if (value not in row_sets[row] and value not in column_sets[column] and value not in box_sets[box]):
+            grid[index] = value
+            row_sets[row].add(value)
+            column_sets[column].add(value)
+            box_sets[box].add(value)
+            if solve_sudoku_internal(grid, row_sets, column_sets, index + 1):
+                return True
+            grid[index] = 0
+            row_sets[row].remove(value)
+            column_sets[column].remove(value)
+            box_sets[box].remove(value)
+    return False
 
+
+def valid(grid: list[int], row:int, column:int, num:int):
+    row_start = row * N
+    if num in grid[row_start: row_start + N]:
+        return False
+    if num in [grid[i * N + column] for i in range(N)]:
+        return False
+    box_row = (row//BOX_SIZE)*BOX_SIZE
+    box_col = (column//BOX_SIZE)*BOX_SIZE
+    for r in range(box_row, box_row + BOX_SIZE):
+        for c in range(box_col, box_col + BOX_SIZE):
+            if grid[r*N+c] == num:
+                return True
 
 def solve_sudoku(grid: list[int]) -> bool:
-    for i in range(len(grid)):
-        row_index = i // N
-        column_index = i % N
-        box_index = (row_index // BOX_SIZE) * N_BOXES + column_index // BOX_SIZE
-        for i in range(1,10):
-            if row_index = i:
-                row_index = row(i)
-            else:
-                row_index = row_index
-        for i in range(len(grid)):
-            def fib(row_index)
-            def fib(column_index)
-            def fib(box_index)
-                
+    # Create empty lists of sets for rows x9, columns x9 and boxes x9
+    row_sets = []
+    column_sets = []
+    box_sets = []
+    for i in range(N):
+        row_sets.append(set())
+        column_sets.append(set())
+        box_sets.append(set())
+    for index, value in enumerate(grid):
+        if value != 0:
+            row = i // N
+            column = i % N
+            box = (row // BOX_SIZE) * N_BOXES + column // BOX_SIZE
+            row_sets[row].add(value)
+            column_sets[column].add(value)
+            box_sets[box].add(value)
+    return solve_sudoku_internal(grid, row_sets, column_sets, box_sets, 0)
 
+    #  enumerate(grid) -> i, element 
+        # Append the element into the correct set
+        # rows[row_index].add(element)
+        # Call a function/do more on solving sudoku
     """
     Solves a sudoku.
 
