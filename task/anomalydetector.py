@@ -1,11 +1,21 @@
 import statistics
 import csv
 
-def deviation():
+def deviation(p_or_m):
     memory_usage_data = []
     anomalies = []
     dates = []
-    with open("/home/georgerhodes/Desktop/work-experience/task/data/memory_data.csv","r") as file:
+
+    def choice(p_or_m):
+        if p_or_m == "memory":
+            return "/home/georgerhodes/Desktop/work-experience/task/data/memory_data.csv"
+        elif p_or_m == "performance":
+            return "/home/georgerhodes/Desktop/work-experience/task/data/performance_data.csv"
+        
+    #choice between performance table and memory table
+    #performance memory data output is kind of mess up as there is such a large range hence the requirement of changepoint detection, after that is made should allow the specification of windows of the data
+
+    with open(choice(p_or_m),"r") as file:
         reader = csv.reader(file)
         header = next(reader)
         for row in reader:
@@ -34,5 +44,5 @@ def deviation():
             anomalies.append(memory_usage_data[num])
     print("Anomalies are ",anomalies)
 
-
-deviation()
+choice = input("Would you like 'memory' data or 'performance' data, type the exact words")
+deviation(choice)
