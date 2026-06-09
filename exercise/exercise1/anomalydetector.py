@@ -11,4 +11,10 @@ with open("/home/georgerhodes/Downloads/memory_data.csv","r") as file:
         print(row[1])
         memory_usage_data.append(row[1])
 
-print(statistics.mean(memory_usage_data))
+memory_usage_data = list(map(float, memory_usage_data))
+
+breakpoint()
+
+mean=(statistics.mean(memory_usage_data))
+
+print(mean)
