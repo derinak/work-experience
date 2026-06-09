@@ -3,7 +3,7 @@ import csv
 
 memory_usage_data = []
 dates = []
-with open("/home/georgerhodes/Desktop/work-experience/task/data/memory_data.csv","r") as file:
+with open("/home/georgerhodes/Desktop/work-experience/task/data/performance_data.csv","r") as file:
     reader = csv.reader(file)
     header = next(reader)
     for row in reader:
