@@ -4,6 +4,27 @@
 
 Build a Python-based monitoring system to detect performance anomalies and changepoints in Cisco router metrics, preventing network outages before they happen. This project applies Netflix's anomaly detection and changepoint techniques (from their performance regression detection system) to network infrastructure monitoring.
 
+## Getting Started
+
+### Setup Instructions
+
+```bash
+# Navigate to project directory
+cd <path>
+
+# Create virtual environment
+python3 -m venv .env
+
+# Activate the environment
+source .env/bin/activate
+
+# Upgrade pip
+pip install --upgrade pip
+
+# Install required packages
+pip install -r requirements.txt
+```
+
 ## Background
 
 Cisco routers are networking devices that forward data packets between computer networks, acting as traffic controllers for the internet. They power a huge portion of the world's internet infrastructure, used by businesses, governments, and ISPs worldwide. When a router fails, businesses lose connectivity, operations stop, and revenue is lost (potentially thousands of dollars per minute).
@@ -62,10 +83,11 @@ Cisco routers are networking devices that forward data packets between computer 
 - `statistics` for mean/stdev calculations - [documentation](https://www.w3schools.com/python/module_statistics.asp)
 - `math` for sqrt and other mathematical operations - [documentation](https://www.w3schools.com/python/module_math.asp)
 - `matplotlib.pyplot` for plotting visualization - [documentation](https://www.w3schools.com/python/matplotlib_pyplot.asp)
+- `pandas` for data manipulation and analysis - [documentation](https://www.w3schools.com/python/pandas/default.asp)
 
 ## Technical Implementation Details
 
-### Anomaly Detection Algorithm
+### Anomaly Detection Algorixthm
 
 ```python
 def detect_anomalies(data, window_size=40, n_sigma=4):
@@ -104,6 +126,87 @@ def detect_changepoints(data, min_size=10):
     #      (difference > 2 * combined_std)
     #   4. Keep split with maximum divergence
     #   5. Filter nearby changepoints
+```
+
+## Real-World Data
+
+The project uses actual XR-E (Cisco Extended Router) performance data collected over a 6-month period from production systems. This data is anonymized and consists of three main metric categories:
+
+### Data Location
+`task/real_data/` - Contains anonymized production performance data
+
+### Metric 1: Reload Time Performance
+Tracks the time required for router reload operations across 3 different platforms.
+
+**Files:**
+- `metric1_run1.pq` - Platform 1 reload times
+- `metric1_run2.pq` - Platform 2 reload times  
+- `metric1_run3_high_variance.pq` - Platform 3 (VXR simulator - high variance/noisy)
+
+**Structure:** Each row contains:
+- `date`: Timestamp of the reload operation
+- `total_seconds`: Total reload time in seconds
+
+**Breakdown Files:**
+- `metric1_breakdown_run1.pq` - Platform 1 phase breakdown
+- `metric1_breakdown_run2.pq` - Platform 2 phase breakdown
+- `metric1_breakdown_run3_high_variance.pq` - Platform 3 phase breakdown
+
+**Breakdown Structure:** Multiple rows per date, one for each phase:
+- `date`: Timestamp of the reload operation
+- `phase`: Phase identifier (Phase 1, Phase 2, etc.)
+- `start_time`: Phase start time (seconds from reload start)
+- `duration`: Phase duration in seconds
+- `end_time`: Phase end time (seconds from reload start)
+
+### Metric 2: Install Performance
+Tracks installation operation times for software upgrades and SMU (Software Maintenance Update) installations.
+
+**Summary Files:**
+- `metric2_large_run1.pq` - Full upgrade install times
+- `metric2_small_run1.pq` - SMU install times
+
+**Structure:** Each row contains:
+- `date`: Timestamp of the install operation
+- `total_seconds`: Total install time in seconds
+
+**Breakdown Files:**
+- `metric2_large_breakdown_run1.pq` - Upgrade install phase breakdown
+- `metric2_small_breakdown_run1.pq` - SMU install phase breakdown
+
+**Breakdown Structure:** Multiple rows per date, one for each phase:
+- `date`: Timestamp of the install operation
+- `phase`: Phase identifier
+- `start_time`: Phase start time (seconds from install start)
+- `duration`: Phase duration in seconds
+- `end_time`: Phase end time (seconds from install start)
+
+### Metric 3: Memory Usage
+Tracks total memory consumption over time.
+
+**Files:**
+- `metric3_run1.pq` - Memory usage data
+
+**Structure:** Each row contains:
+- `date`: Timestamp of the measurement
+- `total_size`: Total memory usage in bytes
+
+### Working with the Data
+
+The data is stored in Parquet format (`.pq` files), which is a columnar storage format optimized for analytics. To read it:
+
+```python
+import pandas as pd
+
+# Load reload time data
+df = pd.read_parquet('task/real_data/metric1_run1.pq')
+
+# Load phase breakdown data
+breakdown_df = pd.read_parquet('task/real_data/metric1_breakdown_run1.pq')
+
+# Example: Calculate average reload time
+avg_reload_time = df['total_seconds'].mean() / 60  # Convert to minutes
+print(f"Average reload time: {avg_reload_time:.2f} minutes")
 ```
 
 ## Bonus Challenges (Extensions)
