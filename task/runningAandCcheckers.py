@@ -4,7 +4,7 @@ from matplotlib import dates
 import matplotlib.pyplot as plt
 import pandas as pd
 
-filename = "task/real_data/metric1_run1.pq"
+filename = "task/real_data/metric1_run2.pq"
 
 
 df = pd.read_parquet(filename)
@@ -18,29 +18,30 @@ for row in df.itertuples():
 #print(dates)
 
 
-def deviation(factor, memory_usage_data, dates):
+def deviation(factor, memory_usage_data, dates, window_size=5):
     anomalies = []
     factor = float(factor)
-    
 
-    
     memory_usage_data = list(map(float, memory_usage_data))
 
-    mean=(statistics.mean(memory_usage_data))
+    for i in range(len(memory_usage_data)):
+        # Determine window boundaries
+        start = max(0, i - window_size)
+        end = i + 1
 
-    #print(mean)
+        window = memory_usage_data[start:end]
 
-    lower_bound = mean-(factor * statistics.pstdev(memory_usage_data))
-    upper_bound = mean+(factor * statistics.pstdev(memory_usage_data))
+        median = statistics.median(window)
+        stdev = statistics.pstdev(window)
 
-    #print(lower_bound)
-    #print(upper_bound)
+        lower_bound = median - factor * stdev
+        upper_bound = median + factor * stdev
 
-    for num in range(len(memory_usage_data)):
-        if memory_usage_data[num] < lower_bound or memory_usage_data[num] > upper_bound:
-            anomalies.append(dates[num])
-            anomalies.append(memory_usage_data[num])
-    print("Anomalies are ",anomalies)
+        if memory_usage_data[i] < lower_bound or memory_usage_data[i] > upper_bound:
+            anomalies.append(dates[i])
+            anomalies.append(memory_usage_data[i])
+
+    print("Anomalies:", anomalies)
     return anomalies
 
 def changepointdetection(memory_usage_data, dates):
@@ -61,13 +62,20 @@ def changepointdetection(memory_usage_data, dates):
     return changepoints
 
 
-def plotdata(data,data1,title):
+def plotdata(data,data1,title, anom, changepoints):
     plt.title(title)
     plt.xlabel("Date & Time")
     plt.ylabel("Reboot Time")
-    plt.plot(data,data1)
+    plt.plot(data,data1, marker ="*")
+    anom_times = anom[0::2]   
+    anom_values = anom[1::2]
+    plt.scatter(anom_times, anom_values, color="red", s=120, label="Highlighted")
+    if changepoints is not None:
+        for cp in changepoints[1::2]:
+            plt.axvline(x=cp, color="green", linestyle="--", linewidth=1.25)
+            plt.text(cp, max(data1), "CP", rotation=90, va="bottom", ha="right")
     plt.show()
 
 print(deviation(2, filedata, dates))
 print(changepointdetection(filedata, dates))
-#plotdata(dates , filedata , filename)
+plotdata(dates , filedata , filename, deviation(2, filedata, dates), changepointdetection(filedata, dates))
