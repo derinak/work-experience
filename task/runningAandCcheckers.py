@@ -4,11 +4,11 @@ from matplotlib import dates
 import matplotlib.pyplot as plt
 import pandas as pd
 
-filename = "task/real_data/metric1_run2.pq"
+filename = "task/real_data/metric2_small_run1.pq"
 
 
 df = pd.read_parquet(filename)
-#print(df)
+print(df)
 filedata = []
 dates = []
 for row in df.itertuples():
@@ -17,10 +17,11 @@ for row in df.itertuples():
 #print(filedata)
 #print(dates)
 
-
-def deviation(factor, memory_usage_data, dates, window_size=5):
+def deviation(factor, memory_usage_data, dates, window_size):
     anomalies = []
     factor = float(factor)
+
+    window_size = int(window_size)
 
     memory_usage_data = list(map(float, memory_usage_data))
 
@@ -40,21 +41,21 @@ def deviation(factor, memory_usage_data, dates, window_size=5):
         if memory_usage_data[i] < lower_bound or memory_usage_data[i] > upper_bound:
             anomalies.append(dates[i])
             anomalies.append(memory_usage_data[i])
-
     print("Anomalies:", anomalies)
     return anomalies
 
-def changepointdetection(memory_usage_data, dates):
+def changepointdetection(memory_usage_data, dates, threshold):
     changepoints = []
+    threshold = int(threshold)
     for i in range(1,len(memory_usage_data)):
         if memory_usage_data[i] > memory_usage_data[i-1]:
-            if memory_usage_data[i] - memory_usage_data[i-1] > 10:    
+            if memory_usage_data[i] - memory_usage_data[i-1] > threshold:    
                 print("Changepoint at ",dates[i]," with a change of ",memory_usage_data[i] - memory_usage_data[i-1])
                 print("new value: ",memory_usage_data[i])
                 print("old value: ",memory_usage_data[i-1])
                 changepoints.append(dates[i])
         elif memory_usage_data[i] < memory_usage_data[i-1]:
-            if memory_usage_data[i-1] - memory_usage_data[i] > 10:    
+            if memory_usage_data[i-1] - memory_usage_data[i] > threshold:    
                 print("Changepoint at ",dates[i]," with a change of ",memory_usage_data[i-1] - memory_usage_data[i])
                 print("new value: ",memory_usage_data[i])
                 print("old value: ",memory_usage_data[i-1])
@@ -76,6 +77,12 @@ def plotdata(data,data1,title, anom, changepoints):
             plt.text(cp, max(data1), "CP", rotation=90, va="bottom", ha="right")
     plt.show()
 
-print(deviation(2, filedata, dates))
-print(changepointdetection(filedata, dates))
-plotdata(dates , filedata , filename, deviation(2, filedata, dates), changepointdetection(filedata, dates))
+factor = input("What factor of deviation for Anomalies?")
+
+window_size = input("What window size for Anomalies?")
+
+threshold = input("What threshold for Changepoints?")
+
+print(deviation(factor, filedata, dates,window_size))
+
+plotdata(dates , filedata , filename, deviation(factor, filedata, dates, window_size), changepointdetection(filedata, dates, threshold))
