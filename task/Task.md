@@ -43,6 +43,29 @@ Cisco routers are networking devices that forward data packets between computer 
 - **Purpose**: Finds subtle, persistent changes and filters out one-time spikes
 - **Key Difference**: Anomaly = one weird spike; Changepoint = permanent shift
 
+### 3. Correlation Analysis
+- **Definition**: Measures how strongly two variables are related to each other
+- **Range**: Correlation values range from -1 to +1
+  - **+1**: Perfect positive correlation (when one goes up, the other goes up)
+  - **0**: No correlation (variables are independent)
+  - **-1**: Perfect negative correlation (when one goes up, the other goes down)
+- **Purpose**: Understand dependencies between metrics (e.g., do slow Phase 2 times always lead to slow Phase 3 times?)
+- **Example in Python**: `correlation = df['phase2'].corr(df['phase3'])`
+
+### 4. Proportion Analysis
+- **Definition**: Calculate what percentage or fraction each part contributes to the whole
+- **Formula**: `proportion = part / total`
+- **Purpose**: Understand relative contributions (e.g., which phase takes up the most time?)
+- **Example**: If Phase 3 takes 120s out of 300s total, its proportion is 120/300 = 0.4 (40%)
+
+### 5. Pattern Classification
+- **Definition**: Grouping similar sequences or behaviors together
+- **Purpose**: Identify "typical" vs "unusual" patterns in how operations execute
+- **Example**: Operations might follow patterns like:
+  - Pattern A: Fast Phase 1, slow Phase 3 (type: "bottleneck at Phase 3")
+  - Pattern B: All phases slow (type: "system-wide slowdown")
+  - Pattern C: All phases fast (type: "normal operation")
+
 ## Requirements
 
 ### Minimum Requirements (Core Features)
@@ -208,6 +231,88 @@ breakdown_df = pd.read_parquet('task/real_data/metric1_breakdown_run1.pq')
 avg_reload_time = df['total_seconds'].mean() / 60  # Convert to minutes
 print(f"Average reload time: {avg_reload_time:.2f} minutes")
 ```
+
+## Real-World Analysis Tasks
+
+The following analysis techniques can provide deeper insights into the performance data:
+
+### 1. Anomaly Detection on Total Metrics
+
+Apply the dynamic threshold anomaly detection (mean + n×σ) to identify unusual performance patterns in the summary time series data.
+
+**Applicable to:**
+- Reload times (`metric1_run*.pq`)
+- Install times (`metric2_large_run1.pq`, `metric2_small_run1.pq`)
+- Memory usage (`metric3_run1.pq`)
+
+**Key Questions:**
+- Which data points are statistical outliers (sudden spikes)?
+- Are anomalies correlated with specific dates/times?
+- Do anomalies appear across multiple platforms simultaneously?
+- Which platforms are most susceptible to anomalies?
+
+### 2. Changepoint Detection on Total Metrics
+
+Use the E-Divisive-inspired approach to identify when performance characteristics fundamentally shift, indicating system changes, configuration updates, or degradation.
+
+**Applicable to:** All summary time series
+
+**Purpose:** Find permanent shifts in behavior (not just one-time spikes). Changepoint detection identifies when the statistical properties of the data fundamentally change.
+
+**Key Questions:**
+- When did performance regime shifts occur (persistent changes)?
+- How does the system behavior differ before vs after each changepoint?
+- Are changepoints correlated with specific dates/times?
+- Do changepoints appear across multiple platforms simultaneously?
+- Which platforms are most susceptible to changepoints?
+
+### 3. Phase-Level Breakdown Analysis
+
+Analyze individual phase behaviors within each operation to identify bottlenecks and phase-specific issues.
+
+**Applicable to:** All breakdown files (`*_breakdown_*.pq`)
+
+**Analysis Approaches:**
+
+#### 3.1 Phase-Specific Anomaly Detection
+Detect when individual phases behave unusually (mean + n×σ), even if total time appears normal.
+
+**Key Questions:**
+- Which phases are most unstable/variable?
+- Do specific phases consistently contribute to slow operations?
+- Are anomalies in one phase correlated with anomalies in adjacent phases?
+
+#### 3.2 Phase Proportion Analysis
+Understand how the relative contribution of each phase changes over time.
+
+**Key Questions:**
+- Has the bottleneck phase shifted over time?
+- Are certain phases becoming more or less dominant?
+- Do proportion changes correlate with total time changes?
+
+#### 3.3 Phase Correlation Analysis
+Identify dependencies and relationships between phases.
+
+**Key Questions:**
+- Which phases have strongly correlated durations?
+- Do slow phases cascade to slow subsequent phases?
+- Are there phase pairs that always vary together?
+
+#### 3.4 Sequential Phase Pattern Mining
+Analyze common patterns in how phase durations follow each other.
+
+**Key Questions:**
+- What are the typical phase duration patterns?
+- Which operations have unusual phase execution sequences?
+- Can we classify operations into distinct pattern groups?
+
+#### 3.5 Phase-Level Changepoint Detection
+Detect when individual phases experience regime changes using the E-Divisive-inspired approach.
+
+**Key Questions:**
+- Do all phases change simultaneously, or do specific phases change independently?
+- Which phases are most stable vs most variable?
+- Can phase-level changes explain total time changepoints?
 
 ## Bonus Challenges (Extensions)
 
