@@ -43,7 +43,16 @@ Cisco routers are networking devices that forward data packets between computer 
 - **Purpose**: Finds subtle, persistent changes and filters out one-time spikes
 - **Key Difference**: Anomaly = one weird spike; Changepoint = permanent shift
 
-### 3. Correlation Analysis
+### 3. Moving Average (Data Smoothing)
+- **Definition**: A technique that averages nearby data points to reduce noise
+- **Method**: For each point, calculate the average of a small window of surrounding points
+- **Purpose**: Smooth out anomalies and noise before changepoint detection
+- **Why Use It**: Anomalies can confuse changepoint detection by inflating segment means and increasing variance
+- **Formula**: For point i with window size w: `smoothed[i] = average(data[i-w/2 : i+w/2])`
+- **Window Size**: Typically 5-9 points (larger = more smoothing, but risk smoothing out real changes)
+- **Key Insight**: Changepoint detection uses entire segment means, while moving average uses small local windows
+
+### 4. Correlation Analysis
 - **Definition**: Measures how strongly two variables are related to each other
 - **Range**: Correlation values range from -1 to +1
   - **+1**: Perfect positive correlation (when one goes up, the other goes up)
@@ -52,13 +61,13 @@ Cisco routers are networking devices that forward data packets between computer 
 - **Purpose**: Understand dependencies between metrics (e.g., do slow Phase 2 times always lead to slow Phase 3 times?)
 - **Example in Python**: `correlation = df['phase2'].corr(df['phase3'])`
 
-### 4. Proportion Analysis
+### 5. Proportion Analysis
 - **Definition**: Calculate what percentage or fraction each part contributes to the whole
 - **Formula**: `proportion = part / total`
 - **Purpose**: Understand relative contributions (e.g., which phase takes up the most time?)
 - **Example**: If Phase 3 takes 120s out of 300s total, its proportion is 120/300 = 0.4 (40%)
 
-### 5. Pattern Classification
+### 6. Pattern Classification
 - **Definition**: Grouping similar sequences or behaviors together
 - **Purpose**: Identify "typical" vs "unusual" patterns in how operations execute
 - **Example**: Operations might follow patterns like:
