@@ -6,22 +6,17 @@ import statistics
 from matplotlib import dates
 import matplotlib.pyplot as plt
 import pandas as pd
+import math
 
 filename = ""
 
-value = [
-    "metric1_run1.pq",
-    "2,10,10",
-    "metric1_run2.pq",
-    "2,2,15",
-    "metric1_run3_high_variance.pq",
-    "2,10,10",
-    "metric2_large_run1.pq",
-    "2,10,10",
-    "metric2_small_run1.pq",
-    "2,10,10",
-    "metric3_run1.pq",
-    "2,10,10"
+runs = [
+    ("task/real_data/metric1_run1.pq", "2,10,10"),
+    ("task/real_data/metric1_run2.pq", "2,2,15"),
+    ("task/real_data/metric1_run3_high_variance.pq", "2,10,10"),
+    ("task/real_data/metric2_large_run1.pq", "2,10,10"),
+    ("task/real_data/metric2_small_run1.pq", "2,10,10"),
+    ("task/real_data/metric3_run1.pq", "2,10,10"),
 ]
 #print(value)
 #df = pd.read_parquet(filename)
@@ -80,7 +75,7 @@ def changepointdetection(data, dates, threshold):
         std_before = statistics.stdev(before_group)
         std_after = statistics.stdev(after_group)
         
-        combined_std = statistics.sqrt((std_before**2 + std_after**2) / 2)
+        combined_std = math.sqrt((std_before**2 + std_after**2) / 2)
 
         if combined_std == 0:
             continue
@@ -124,73 +119,23 @@ def plotdata(dates, values, title, anomalies, changepoints):
 
 window_size_avrg = 10#input("What window size for the moving average?")
 
-for x in range(1,6):
-    rows=2
-    # if x==1:
-    #     filename="task/real_data/metric1_breakdown_run1.pq"
-    #     rows = 3
-    # elif x==2:
-    #     filename="task/real_data/metric1_breakdown_run2.pq"
-    #     rows = 3
-    # elif x==3:
-    #     filename="task/real_data/metric1_breakdown_run3_high_variance.pq"
-    #     rows = 3 
-    if x==1:
-        filename="task/real_data/metric1_run1.pq"
-        print(value[x-1])
-        print(value[x])
-        factor = input("What factor of deviation for Anomalies in " + filename + "?")
-        window_size = input("What window size for Anomalies in " + filename + "?")
-        threshold = input("What threshold for Changepoints in " + filename + "?")
-    elif x==2:
-        filename="task/real_data/metric1_run2.pq"
-        print(value[x])
-        print(value[x+1])
-        factor = input("What factor of deviation for Anomalies in " + filename + "?")
-        window_size = input("What window size for Anomalies in " + filename + "?")
-        threshold = input("What threshold for Changepoints in " + filename + "?")
-    elif x==3:
-        filename="task/real_data/metric1_run3_high_variance.pq"
-        print(value[x+1])
-        print(value[x+2])
-        factor = input("What factor of deviation for Anomalies in " + filename + "?")
-        window_size = input("What window size for Anomalies in " + filename + "?")
-        threshold = input("What threshold for Changepoints in " + filename + "?")
-    # elif x==7:
-    #     filename="task/real_data/metric2_large_breakdown_run1.pq"
-    #     rows= 3
-    elif x==4:
-        filename="task/real_data/metric2_large_run1.pq"
-        print(value[x+2])
-        print(value[x+3])
-        factor = input("What factor of deviation for Anomalies in " + filename + "?")
-        window_size = input("What window size for Anomalies in " + filename + "?")
-        threshold = input("What threshold for Changepoints in " + filename + "?")
-    # elif x==9:
-    #     filename="task/real_data/metric2_small_breakdown_run1.pq"
-    #     rows = 3
-    elif x==5:
-        filename="task/real_data/metric2_small_run1.pq"
-        print(value[x+3])
-        print(value[x+4])
-        factor = input("What factor of deviation for Anomalies in " + filename + "?")
-        window_size = input("What window size for Anomalies in " + filename + "?")
-        threshold = input("What threshold for Changepoints in " + filename + "?")
-    elif x==6:
-        filename="task/real_data/metric3_run1.pq"
-        print(value[x+4])
-        print(value[x+5])
-        factor = input("What factor of deviation for Anomalies in " + filename + "?")
-        window_size = input("What window size for Anomalies in " + filename + "?")
-        threshold = input("What threshold for Changepoints in " + filename + "?")
+for filename, meta in runs:
+    print(filename)
+    print(meta)
+
+    factor = input(f"What factor of deviation for Anomalies in {filename}? ")
+    window_size = input(f"What window size for Anomalies in {filename}? ")
+    threshold = input(f"What threshold for Changepoints in {filename}? ")
+
     
     df = pd.read_parquet(filename)
     print(df)
     filedata = []
     dates = []
     for row in df.itertuples():
-        filedata.append(row[rows])
+        filedata.append(row[2])
         dates.append(row[1])
     
     plt.figure()
-    plotdata(dates, filedata, filename, deviation(factor, filedata, dates, window_size), changepointdetection(filedata, dates, threshold))#could have rolling avg instead of filedata for the changepoint detection function
+
+    plotdata(dates, filedata, filename, deviation(factor, filedata, dates, window_size), changepointdetection(rolling_average(filedata, window_size), dates, threshold))#can either have rolling average or filedata
