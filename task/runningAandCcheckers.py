@@ -51,7 +51,15 @@ def deviation(factor, memory_usage_data, dates, window_size):
     print("Anomalies:", anomalies)
     return anomalies
 
-
+def rolling_average(data, window_size):
+    rolling_averages = []
+    for i in range(len(data)):
+        start = max(0, i - window_size + 1)
+        window = data[start:i + 1]
+        average = sum(window) / len(window)
+        rolling_averages.append(average)
+    print("Rolling Averages:", rolling_averages)
+    return rolling_averages
 
 def changepointdetection(memory_usage_data, dates, threshold):
     changepoints = []
@@ -128,6 +136,7 @@ for x in range(4,11):
     for row in df.itertuples():
         filedata.append(row[rows])
         dates.append(row[1])
-
+    rolling_average(filedata, window_size=5)
+    breakpoint()
     plt.figure()
-    plotdata(dates, filedata, filename, deviation(factor, filedata, dates, window_size), changepointdetection(filedata, dates, threshold))
+    plotdata(dates, filedata, filename, deviation(factor, filedata, dates, window_size), changepointdetection(rolling_average(filedata, window_size=5), dates, threshold))
