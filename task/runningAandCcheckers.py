@@ -11,12 +11,12 @@ import math
 filename = ""
 
 runs = [
-    ("task/real_data/metric1_run1.pq", "2,10,1"),
-    ("task/real_data/metric1_run2.pq", "2,2,3"),
-    ("task/real_data/metric1_run3_high_variance.pq", "2,2,3"),
-    ("task/real_data/metric2_large_run1.pq", "2,5,1"),
-    ("task/real_data/metric2_small_run1.pq", "2,5,3"),
-    ("task/real_data/metric3_run1.pq", "2,10,3"),
+    ("task/real_data/metric1_run1.pq", "2,10,1,30"),
+    ("task/real_data/metric1_run2.pq", "2,2,3,30"),
+    ("task/real_data/metric1_run3_high_variance.pq", "2,2,3,30"),
+    ("task/real_data/metric2_large_run1.pq", "2,5,1,10"),
+    ("task/real_data/metric2_small_run1.pq", "2,5,2,20"),
+    ("task/real_data/metric3_run1.pq", "2,10,3,30"),
 ]
 
 def deviation(factor, memory_usage_data, dates, window_size):
@@ -53,7 +53,8 @@ def rolling_average(data, window_size):
         rolling_averages.append(average)
     return rolling_averages
 
-def changepointdetection(data, dates, divergence_threshold, window=30):
+def changepointdetection(data, dates, divergence_threshold, window):
+    window = int(window)
     changepoints = []
     changepoint_dates = []
     changepoint_divergence = []
@@ -154,6 +155,7 @@ for filename, meta in runs:
     factor = input(f"What factor of deviation for Anomalies in {filename}? ")
     window_size = input(f"What window size for Anomalies in {filename}? ")
     threshold = input(f"What threshold for Changepoints in {filename}? ")
+    ch_window = input(f"What window size for Changepoints in {filename}? ")
 
     
     df = pd.read_parquet(filename)
@@ -168,4 +170,4 @@ for filename, meta in runs:
 
     avg = rolling_average(filedata, window_size_avrg)
 
-    plotdata(dates,filedata,avg,filename,deviation(factor, filedata, dates, window_size),changepointdetection(filedata, dates, threshold))#
+    plotdata(dates,filedata,avg,filename,deviation(factor, filedata, dates, window_size),changepointdetection(filedata, dates, threshold, ch_window))#
