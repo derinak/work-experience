@@ -18,16 +18,6 @@ runs = [
     ("task/real_data/metric2_small_run1.pq", "2,5,3"),
     ("task/real_data/metric3_run1.pq", "2,10,3"),
 ]
-#print(value)
-#df = pd.read_parquet(filename)
-#print(df)
-#filedata = []
-#dates = []
-#for row in df.itertuples():
-    #filedata.append(row[2])
-    #dates.append(row[1])
-#print(filedata)
-#print(dates)
 
 def deviation(factor, memory_usage_data, dates, window_size):
     anomalies = []
@@ -48,7 +38,9 @@ def deviation(factor, memory_usage_data, dates, window_size):
 
         if memory_usage_data[i] < lower or memory_usage_data[i] > upper:
             anomalies.append((dates[i], memory_usage_data[i]))
-
+    print("Anomalies detetcted")
+    for f in range(len(anomalies)):
+        print(f"  Date: {anomalies[f][0]}, Value: {anomalies[f][1]}") 
     return anomalies
 
 def rolling_average(data, window_size):
@@ -59,7 +51,6 @@ def rolling_average(data, window_size):
         window = data[start:i + 1]
         average = sum(window) / len(window)
         rolling_averages.append(average)
-    print("Rolling Averages:", rolling_averages)
     return rolling_averages
 
 def changepointdetection(data, dates, divergence_threshold, window=30):
@@ -111,10 +102,12 @@ def changepointdetection(data, dates, divergence_threshold, window=30):
 
 
 
-    # print("Changepoints detected:")
-    # for i, date in enumerate(changepoint_dates):
-    #     print(f"  Index: {changepoints[i]}, Date: {date}")
-    
+    print("Changepoints detected:")
+    for i, date in enumerate(changepoint_dates):
+        print(f"  Index: {changepoints[i]}, Date: {date}")
+    print("Filtered Changepoints:")
+    for i in filtered:
+        print(f"  Index: {changepoints[i]}, Date: {changepoint_dates[i]}")
     return [changepoints[k] for k in filtered]
 
 def plotdata(dates, values, avg_values, title, anomalies, changepoints):
@@ -152,7 +145,7 @@ def plotdata(dates, values, avg_values, title, anomalies, changepoints):
 
 
 
-window_size_avrg = 10#input("What window size for the moving average?")
+window_size_avrg = 10
 
 for filename, meta in runs:
     print(filename)
