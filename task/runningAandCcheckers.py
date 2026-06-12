@@ -113,8 +113,16 @@ def changepointdetection(data, dates, divergence_threshold, window):
 
 def plotdata(dates, values, avg_values, title, anomalies, changepoints):
     plt.title(title)
-    plt.xlabel("Date & Time")
-    plt.ylabel("Reboot Time")
+    
+    if filename == "task/real_data/metric1_run1.pq" or filename == "task/real_data/metric1_run2.pq" or filename == "task/real_data/metric1_run3_high_variance.pq":
+        plt.xlabel("Date & Time")
+        plt.ylabel("Reboot Time")
+    elif filename == "task/real_data/metric2_large_run1.pq" or filename == "task/real_data/metric2_small_run1.pq":
+        plt.xlabel("Date & Time")
+        plt.ylabel("Installation Time")
+    elif filename == "task/real_data/metric3_run1.pq":
+        plt.xlabel("Date & Time")
+        plt.ylabel("Memory Usage")
 
     
     plt.plot(dates, avg_values, marker="*", label="Data")
