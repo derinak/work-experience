@@ -11,12 +11,12 @@ import math
 filename = ""
 
 runs = [
-    ("task/real_data/metric1_run1.pq", "2,10,10"),
-    ("task/real_data/metric1_run2.pq", "2,2,15"),
-    ("task/real_data/metric1_run3_high_variance.pq", "2,2,10"),
-    ("task/real_data/metric2_large_run1.pq", "2,5,10"),
-    ("task/real_data/metric2_small_run1.pq", "2,5,10"),
-    ("task/real_data/metric3_run1.pq", "2,10,10"),
+    ("task/real_data/metric1_run1.pq", "2,10,3"),
+    ("task/real_data/metric1_run2.pq", "2,2,3"),
+    ("task/real_data/metric1_run3_high_variance.pq", "2,2,3"),
+    ("task/real_data/metric2_large_run1.pq", "2,5,1"),
+    ("task/real_data/metric2_small_run1.pq", "2,5,3"),
+    ("task/real_data/metric3_run1.pq", "2,10,3"),
 ]
 #print(value)
 #df = pd.read_parquet(filename)
@@ -62,11 +62,11 @@ def rolling_average(data, window_size):
     print("Rolling Averages:", rolling_averages)
     return rolling_averages
 
-def changepointdetection(data, dates, window=30, divergence_threshold=3.0):
+def changepointdetection(data, dates, divergence_threshold, window=30):
     changepoints = []
     changepoint_dates = []
     changepoint_divergence = []
-
+    divergence_threshold = float(divergence_threshold)
     for split_point in range(window, len(data) - window):
         before_group = data[split_point - window : split_point]
         after_group  = data[split_point : split_point + window]
@@ -98,7 +98,7 @@ def changepointdetection(data, dates, window=30, divergence_threshold=3.0):
         cluster = [i]
         j = i + 1
 
-        while j < len(changepoints) and changepoints[j] - changepoints[i] < 30:
+        while j < len(changepoints) and changepoints[j] - changepoints[i] < 25:
             cluster.append(j)
             j += 1
 
@@ -160,7 +160,7 @@ for filename, meta in runs:
 
     factor = input(f"What factor of deviation for Anomalies in {filename}? ")
     window_size = input(f"What window size for Anomalies in {filename}? ")
-    #threshold = input(f"What threshold for Changepoints in {filename}? ")
+    threshold = input(f"What threshold for Changepoints in {filename}? ")
 
     
     df = pd.read_parquet(filename)
@@ -175,4 +175,4 @@ for filename, meta in runs:
 
     avg = rolling_average(filedata, window_size_avrg)
 
-    plotdata(dates,filedata,avg,filename,deviation(factor, filedata, dates, window_size),changepointdetection(rolling_average(filedata, window_size_avrg), dates))#
+    plotdata(dates,filedata,avg,filename,deviation(factor, filedata, dates, window_size),changepointdetection(rolling_average(filedata, window_size_avrg), dates, threshold))#
