@@ -38,7 +38,7 @@ def deviation(factor, memory_usage_data, dates, window_size):
 
         if memory_usage_data[i] < lower or memory_usage_data[i] > upper:
             anomalies.append((dates[i], memory_usage_data[i]))
-    print("Anomalies detetcted")
+    print("Anomalies detected")
     for f in range(len(anomalies)):
         print(f"  Date: {anomalies[f][0]}, Value: {anomalies[f][1]}") 
     return anomalies
