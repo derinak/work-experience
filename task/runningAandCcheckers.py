@@ -11,7 +11,7 @@ import math
 filename = ""
 
 runs = [
-    ("task/real_data/metric1_run1.pq", "2,10,3"),
+    ("task/real_data/metric1_run1.pq", "2,10,1"),
     ("task/real_data/metric1_run2.pq", "2,2,3"),
     ("task/real_data/metric1_run3_high_variance.pq", "2,2,3"),
     ("task/real_data/metric2_large_run1.pq", "2,5,1"),
@@ -175,4 +175,4 @@ for filename, meta in runs:
 
     avg = rolling_average(filedata, window_size_avrg)
 
-    plotdata(dates,filedata,avg,filename,deviation(factor, filedata, dates, window_size),changepointdetection(rolling_average(filedata, window_size_avrg), dates, threshold))#
+    plotdata(dates,filedata,avg,filename,deviation(factor, filedata, dates, window_size),changepointdetection(filedata, dates, threshold))#
