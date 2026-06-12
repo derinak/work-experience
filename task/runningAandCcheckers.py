@@ -62,7 +62,7 @@ def rolling_average(data, window_size):
     print("Rolling Averages:", rolling_averages)
     return rolling_averages
 
-def changepointdetection(data, dates, window=20, divergence_threshold=3.0):
+def changepointdetection(data, dates, window=30, divergence_threshold=3.0):
     changepoints = []
     changepoint_dates = []
     changepoint_divergence = []
@@ -98,7 +98,7 @@ def changepointdetection(data, dates, window=20, divergence_threshold=3.0):
         cluster = [i]
         j = i + 1
 
-        while j < len(changepoints) and changepoints[j] - changepoints[i] < 5:
+        while j < len(changepoints) and changepoints[j] - changepoints[i] < 30:
             cluster.append(j)
             j += 1
 
@@ -115,7 +115,7 @@ def changepointdetection(data, dates, window=20, divergence_threshold=3.0):
     # for i, date in enumerate(changepoint_dates):
     #     print(f"  Index: {changepoints[i]}, Date: {date}")
     
-    return filtered
+    return [changepoints[k] for k in filtered]
 
 def plotdata(dates, values, avg_values, title, anomalies, changepoints):
     plt.title(title)
@@ -132,7 +132,7 @@ def plotdata(dates, values, avg_values, title, anomalies, changepoints):
         color="blue",
         alpha=0.25,   
         linewidth=2,
-        label="Rolling Average"
+        label="Raw Data"
     )
 
     if anomalies:
@@ -175,4 +175,4 @@ for filename, meta in runs:
 
     avg = rolling_average(filedata, window_size_avrg)
 
-    plotdata(dates,filedata,avg,filename,deviation(factor, filedata, dates, window_size),changepointdetection(filedata, dates))
+    plotdata(dates,filedata,avg,filename,deviation(factor, filedata, dates, window_size),changepointdetection(rolling_average(filedata, window_size_avrg), dates))#
